@@ -16,22 +16,26 @@ class Color(Enum):
     BLACK = 2
 
 class Daisy:
+    __color = None
+    __age = 0
+    __albedo = None
+
     def __init__(self, color):
-        self.color = color
-        if (color == Color.WHITE):
-            self.albedo = WHITE_ALBEDO
-        elif (color == Color.BLACK):
-            self.albedo = BLACK_ALBEDO
+        self.__color = color
+        if (self.__color == Color.WHITE):
+            self.__albedo = WHITE_ALBEDO
+        elif (self.__color == Color.BLACK):
+            self.__albedo = BLACK_ALBEDO
         '''
         根据代码，age 是一个 0 - MAX_AGE 的随机数
         '''
-        self.age = random.randint(0,MAX_AGE)
+        self.__age = random.randint(0, MAX_AGE)
 
     '''
     get_age 方法
     '''
     def get_age(self):
-        return self.age
+        return self.__age
 
 # Test
 class main():
