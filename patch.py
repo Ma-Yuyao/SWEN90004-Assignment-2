@@ -1,7 +1,6 @@
 import math
 import random
 
-import simulator
 import daisy
 from daisy import Daisy, Color
 
@@ -14,12 +13,12 @@ class Patch(object):
         self.x = x
         self.y = y
 
-    def calculate_local_temperature(self):
+    def calculate_local_temperature(self, albedo_of_surface, solar_luminosity):
 
         if self._daisy is None:
-            absorbed_luminosity = ((1 - simulator.albedo_of_surface) * simulator.solar_luminosity)
+            absorbed_luminosity = ((1 - albedo_of_surface) * solar_luminosity)
         else:
-            absorbed_luminosity = ((1 - self._daisy.albedo) * simulator.solar_luminosity)
+            absorbed_luminosity = ((1 - self._daisy.get_albedo()) * solar_luminosity)
         if absorbed_luminosity > 0:
             local_heating = 72 * \
                             math.log(absorbed_luminosity) + 80
@@ -31,8 +30,8 @@ class Patch(object):
     def check_survivability(self):
         if self._daisy is None:
             return False
-        if self._daisy.age < daisy.MAX_AGE:
-            print(self._daisy.age)
+        if self._daisy.get_age() < daisy.MAX_AGE:
+            print(self._daisy.get_age())
             print(self._temperature)
             seed_threshold = (0.1457 * self._temperature) - (0.0032 * self._temperature * self._temperature) - 0.6443
             print(seed_threshold)
@@ -42,12 +41,22 @@ class Patch(object):
         else:
             self._daisy = None
             return False
-#test
+
+    def get_daisy(self):
+        return self._daisy
+
+    def set_daisy(self, daisy_type):
+        self._daisy = Daisy(daisy_type)
+
+    @property
+    def temperature(self):
+        return self._temperature
+
+
+# test
 class main():
     patch = Patch(1, 2)
     patch._daisy = Daisy(Color.BLACK)
-    patch.calculate_local_temperature()
-    print(patch._temperature)
+    patch.calculate_local_temperature(1, 2)
+    print(patch.temperature)
     print(patch.check_survivability())
-
-
