@@ -8,6 +8,7 @@ from daisy import Daisy, Color
 class Patch(object):
     _daisy = None
     _temperature = 0
+    _receiced_diffuse = 0
 
     def __init__(self, x, y):
         self.x = x
@@ -31,10 +32,10 @@ class Patch(object):
         if self._daisy is None:
             return False
         if self._daisy.get_age() < daisy.MAX_AGE:
-            print(self._daisy.get_age())
-            print(self._temperature)
+            # print(self._daisy.get_age())
+            # print(self._temperature)
             seed_threshold = (0.1457 * self._temperature) - (0.0032 * self._temperature * self._temperature) - 0.6443
-            print(seed_threshold)
+            # print(seed_threshold)
             if random.random() < seed_threshold:
                 return True
             return False
@@ -48,15 +49,24 @@ class Patch(object):
     def set_daisy(self, daisy_type):
         self._daisy = Daisy(daisy_type)
 
-    @property
-    def temperature(self):
+    
+    def get_temperature(self):
         return self._temperature
+    
+    def set_temperature(self, temperature):
+        self._temperature = temperature
+
+    def get_receiced_diffuse(self):
+        return self._receiced_diffuse
+    
+    def set_receiced_diffuse(self, receiced_diffuse):
+        self._receiced_diffuse = receiced_diffuse
 
 
 # test
-class main():
-    patch = Patch(1, 2)
-    patch._daisy = Daisy(Color.BLACK)
-    patch.calculate_local_temperature(1, 2)
-    print(patch.temperature)
-    print(patch.check_survivability())
+# class main():
+#     patch = Patch(1, 2)
+#     patch._daisy = Daisy(Color.BLACK)
+#     patch.calculate_local_temperature(1, 2)
+#     print(patch.temperature)
+#     print(patch.check_survivability())
