@@ -9,6 +9,7 @@ class Patch(object):
     _daisy = None
     _temperature = 0
     _receiced_diffuse = 0
+    _local_heating = 0
 
     def __init__(self, x, y):
         self.x = x
@@ -21,21 +22,20 @@ class Patch(object):
         else:
             absorbed_luminosity = ((1 - self._daisy.get_albedo()) * solar_luminosity)
         if absorbed_luminosity > 0:
-            local_heating = 72 * \
-                            math.log(absorbed_luminosity) + 80
+            self._local_heating = 72 * math.log(absorbed_luminosity) + 80
         else:
-            local_heating = 80
-        self._temperature = ((self._temperature + local_heating) / 2)
+            self._local_heating = 80
+        self._temperature = ((self._temperature + self._local_heating) / 2)
         # return self._temperature
 
     def check_survivability(self):
         if self._daisy is None:
             return False
+        self._daisy.set_age(self._daisy.get_age() + 1)
         if self._daisy.get_age() < daisy.MAX_AGE:
             # print(self._daisy.get_age())
             # print(self._temperature)
             seed_threshold = (0.1457 * self._temperature) - (0.0032 * self._temperature * self._temperature) - 0.6443
-            # print(seed_threshold)
             if random.random() < seed_threshold:
                 return True
             return False
@@ -61,6 +61,9 @@ class Patch(object):
     
     def set_receiced_diffuse(self, receiced_diffuse):
         self._receiced_diffuse = receiced_diffuse
+    
+    def get_local_heating(self):
+        return self._local_heating
 
 
 # test

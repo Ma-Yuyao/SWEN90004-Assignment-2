@@ -4,8 +4,8 @@ import random
 '''
 WHITE_ALBEDO 和 BLACK_ALBEDO 和 MAX_AGE 应当定义在 Simulator 类中，此处仅用作测试
 '''
-WHITE_ALBEDO = 1
-BLACK_ALBEDO = 0
+WHITE_ALBEDO = 0.75
+BLACK_ALBEDO = 0.25
 MAX_AGE = 25
 
 '''
@@ -16,7 +16,6 @@ MAX_AGE = 25
 class Color(Enum):
     WHITE = 1
     BLACK = 2
-
 
 class Daisy:
     _color = None
@@ -46,6 +45,15 @@ class Daisy:
 
     def get_albedo(self):
         return self._albedo
+    
+    def set_albedo(self, albedo):
+        self._albedo = albedo
+
+    def set_age(self, age):
+        self._age = age
+
+
+
 # Test
 # class main():
 #     daisy = Daisy(Color.WHITE)
