@@ -1,18 +1,7 @@
 from enum import Enum
 import random
 
-'''
-WHITE_ALBEDO 和 BLACK_ALBEDO 和 MAX_AGE 应当定义在 Simulator 类中，此处仅用作测试
-'''
-# WHITE_ALBEDO = 0.75
-# BLACK_ALBEDO = 0.25
-MAX_AGE = 25
-
-'''
-定义 Color 枚举
-'''
-
-
+# Define Color Enum
 class Color(Enum):
     WHITE = 1
     BLACK = 2
@@ -21,21 +10,22 @@ class Daisy:
     _color = None
     _age = 0
     _albedo = None
+    _max_age = 0
 
-    def __init__(self, color, albedo):
+    def __init__(self, color, albedo, max_age):
         self._color = color
         self._albedo = albedo
-        '''
-        根据代码，age 是一个 0 - MAX_AGE 的随机数
-        '''
-        self._age = random.randint(0, MAX_AGE)
+        self._max_age = max_age
 
-    '''
-    get_age 方法
-    '''
+        # Based on NetLogo code，age is a random int between 0 to max_age
+        self._age = random.randint(0, self._max_age)
 
+    # Geter and Seter functions
     def get_age(self):
         return self._age
+    
+    def set_age(self, age):
+        self._age = age
 
     def get_color(self):
         return self._color
@@ -46,12 +36,5 @@ class Daisy:
     def set_albedo(self, albedo):
         self._albedo = albedo
 
-    def set_age(self, age):
-        self._age = age
-
-
-
-# Test
-# class main():
-#     daisy = Daisy(Color.WHITE)
-#     print(daisy.get_age())
+    def get_max_age(self):
+        return self._max_age
