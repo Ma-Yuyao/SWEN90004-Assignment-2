@@ -1,7 +1,7 @@
 import argparse
 import random
 
-import numpy
+# import numpy
 
 # from pandas import np
 from daisy import Color, Daisy
@@ -15,30 +15,20 @@ MAX_YCOR = 29
 # {(x,y):patch}
 patch_graph = {}
 
-# 默认总 tick 是无穷大
-total_ticks = float('inf')
-current_tick = 0
-# black_num = 0
-# white_num = 0
-# global_temperature = 0
-
 def get_input():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--ticks", help="total ticks, Default: Infinite", type=float, nargs='?', const=1, default=float('inf'))
     parser.add_argument("--start_whites", help="white num", type=int, nargs='?', const=1, default=20,
                         choices=range(0, 50))
     parser.add_argument("--start_blacks", help="black num", type=int, nargs='?', const=1, default=20,
                         choices=range(0, 50))
-    parser.add_argument("--albedo_whites", help="albedo of whites", type=float, nargs='?', const=1, default=0.75,
-                        choices=numpy.arange(0, 1, 0.01))
-    parser.add_argument("--albedo_blacks", help="albedo of blacks", type=float, nargs='?', const=1, default=0.25,
-                        choices=numpy.arange(0, 1, 0.01))
+    parser.add_argument("--albedo_whites", help="albedo of whites", type=float, nargs='?', const=1, default=0.75)
+    parser.add_argument("--albedo_blacks", help="albedo of blacks", type=float, nargs='?', const=1, default=0.25)
     parser.add_argument("--scenario", help="scenario", nargs='?', const=1, default="main-cuurent-luminosity",
                         choices=["ramp-up-ramp-down", "low-solar-luminosity", "our-solar-luminosity",
                                  "high-solar-luminosity"])
-    parser.add_argument("--solar_luminosity", help="albedo of surface", type=float, nargs='?', const=1, default=0.800,
-                        choices=numpy.arange(0.000, 3.000, 0.001))
-    parser.add_argument("--albedo_of_surface", help="albedo of surface", type=float, nargs='?', const=1, default=0.4,
-                        choices=numpy.arange(0, 1, 0.01))
+    parser.add_argument("--solar_luminosity", help="albedo of surface", type=float, nargs='?', const=1, default=0.800)
+    parser.add_argument("--albedo_of_surface", help="albedo of surface", type=float, nargs='?', const=1, default=0.4)
     args = parser.parse_args()
 
     return args
@@ -52,6 +42,7 @@ def output(current_tick, white_num, black_num, solar_luminosity, global_temperat
 class Simulator(object):
 
     def __init__(self, args):
+        self.total_ticks = args.ticks
         self.start_whites = args.start_whites
         self.start_blacks = args.start_blacks
         self.albedo_whites = args.albedo_whites
@@ -63,6 +54,7 @@ class Simulator(object):
         self.black_num = 0
         self.white_num = 0
         self.global_temperature = 0
+        self.current_tick = 0
 
     def set_up_patch_graph(self):
         for x in range(MIN_XCOR, MAX_XCOR):
@@ -141,7 +133,11 @@ class Simulator(object):
                     neighbor = patch_graph[neighbor_pos]
                     if neighbor.get_daisy() is None:
                         # print("Set daisy at", neighbor.x, neighbor.y)
-                        neighbor.set_daisy(patch.get_daisy().get_color())
+                        if patch.get_daisy().get_color() == Color.WHITE:
+                            albedo = self.albedo_whites
+                        if patch.get_daisy().get_color() == Color.BLACK:
+                            albedo = self.albedo_blacks
+                        neighbor.set_daisy(patch.get_daisy().get_color(), albedo)
                         break
         # num = len(patch_list)
         # for i in range(0, num):
@@ -230,12 +226,12 @@ class Simulator(object):
         for white_count in range(0, white_daisies_num):
             empty_patch, empty_patch_list = self.get_random_patch(empty_patch_list)
             if empty_patch != None:
-                empty_patch.set_daisy(Color.WHITE)
+                empty_patch.set_daisy(Color.WHITE, self.albedo_whites)
                 patch_graph[empty_patch.x, empty_patch.y] = empty_patch
         for black_count in range(0, white_daisies_num):
             empty_patch, empty_patch_list = self.get_random_patch(empty_patch_list)
             if empty_patch != None:
-                empty_patch.set_daisy(Color.BLACK)
+                empty_patch.set_daisy(Color.BLACK, self.albedo_blacks)
                 patch_graph[empty_patch.x, empty_patch.y] = empty_patch
 
     def calc_temperature(self):
@@ -268,7 +264,7 @@ class Simulator(object):
         
 
     def initialize(self):
-        
+
         if (self.scenario == "low-solar-luminosity"):
                 self.solar_luminosity = 0.6
             
@@ -279,10 +275,10 @@ class Simulator(object):
             self.solar_luminosity = 1.4
         
         if (self.scenario == "ramp-up-ramp-down"):
-            if (current_tick > 200 and current_tick <= 400):
+            if (self.current_tick > 200 and self.current_tick <= 400):
                 # 保留4位小数
                 self.solar_luminosity = float(format((self.solar_luminosity + 0.005), '.4f'))
-            if (current_tick > 600 and current_tick <= 850):
+            if (self.current_tick > 600 and self.current_tick <= 850):
                 self.solar_luminosity = float(format((self.solar_luminosity - 0.0025), '.4f'))
         
         self.set_up_patch_graph()
@@ -294,11 +290,10 @@ class Simulator(object):
         
         
     def update_every_tick(self):
-        global current_tick
-        while(current_tick <= total_ticks):
+        while(self.current_tick <= self.total_ticks):
             self.white_num = self.get_daisy_num(Color.WHITE)
             self.black_num = self.get_daisy_num(Color.BLACK)
-            output(current_tick, self.white_num, self.black_num, self.solar_luminosity, self.global_temperature)
+            output(self.current_tick, self.white_num, self.black_num, self.solar_luminosity, self.global_temperature)
             
             # equal: ask patches [calc-temperature]
             self.calc_temperature()
@@ -312,7 +307,7 @@ class Simulator(object):
             # equal: set global-temperature (mean [temperature] of patches)
             self.cal_global_temperature()
 
-            current_tick += 1
+            self.current_tick += 1
             
             if (self.scenario == "low-solar-luminosity"):
                 self.solar_luminosity = 0.6
@@ -324,10 +319,10 @@ class Simulator(object):
                 self.solar_luminosity = 1.4
             
             if (self.scenario == "ramp-up-ramp-down"):
-                if (current_tick > 200 and current_tick <= 400):
+                if (self.current_tick > 200 and self.current_tick <= 400):
                     # 保留4位小数
                     self.solar_luminosity = float(format((self.solar_luminosity + 0.005), '.4f'))
-                if (current_tick > 600 and current_tick <= 850):
+                if (self.current_tick > 600 and self.current_tick <= 850):
                     self.solar_luminosity = float(format((self.solar_luminosity - 0.0025), '.4f'))
 
     def test(self):

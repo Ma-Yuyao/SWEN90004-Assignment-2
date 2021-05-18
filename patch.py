@@ -46,8 +46,8 @@ class Patch(object):
     def get_daisy(self):
         return self._daisy
 
-    def set_daisy(self, daisy_type):
-        self._daisy = Daisy(daisy_type)
+    def set_daisy(self, color, albedo):
+        self._daisy = Daisy(color, albedo)
 
     
     def get_temperature(self):

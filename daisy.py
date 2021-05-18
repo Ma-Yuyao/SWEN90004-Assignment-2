@@ -4,8 +4,8 @@ import random
 '''
 WHITE_ALBEDO 和 BLACK_ALBEDO 和 MAX_AGE 应当定义在 Simulator 类中，此处仅用作测试
 '''
-WHITE_ALBEDO = 0.75
-BLACK_ALBEDO = 0.25
+# WHITE_ALBEDO = 0.75
+# BLACK_ALBEDO = 0.25
 MAX_AGE = 25
 
 '''
@@ -22,12 +22,9 @@ class Daisy:
     _age = 0
     _albedo = None
 
-    def __init__(self, color):
+    def __init__(self, color, albedo):
         self._color = color
-        if self._color == Color.WHITE:
-            self._albedo = WHITE_ALBEDO
-        elif self._color == Color.BLACK:
-            self._albedo = BLACK_ALBEDO
+        self._albedo = albedo
         '''
         根据代码，age 是一个 0 - MAX_AGE 的随机数
         '''
