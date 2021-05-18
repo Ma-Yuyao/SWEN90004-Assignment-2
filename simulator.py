@@ -1,6 +1,6 @@
 import argparse
 import random
-
+from daisy import Color
 import numpy
 
 # from pandas import np
@@ -14,6 +14,10 @@ MAX_YCOR = 28
 
 # {(x,y):patch}
 patch_graph = {}
+
+#tick, timer used to monitor progress of the model
+TICK  = 0
+global_temperature = 0
 
 
 def get_input():
@@ -46,7 +50,7 @@ class Simulator(object):
 
     def __init__(self, args):
         self.start_whites = args.start_whites
-        self.star_blacks = args.start_blacks
+        self.start_blacks = args.start_blacks
         self.albedo_whites = args.albedo_whites
         self.albedo_blacks = args.albedo_blacks
         self.albedo_of_surface = args.albedo_of_surface
@@ -122,13 +126,115 @@ class Simulator(object):
                     if neighbor.get_daisy() is None:
                         neighbor.set_daisy(rand_patch.get_daisy().get_color())
                         break
+        '''
+        1 runInTick() -- 每一个 tick 的更新 (output)
+        getDaisyNum()
+        Patch.calTemperature()
+        diffuseHandler();
+        checkSurvivabilityHandler()
+        setGlobalTemperature();
+        getDaisyNum（） -- get the num of given type daisies in all the patches
+        setGlobalTemperature（）-- set the global temperature
+        
+        '''
+
+    '''
+    ==================
+    问题:一开始是铺满了daisy而且全部是活的的吗
+    所有的patch怎么一开始都有,但是daisy都是none而且所有温度都是0
+    ==================
+    '''
+    def runInTick(self):
+
+        #update tick, step = 1
+        tick = TICK + 1
+        self.TICK = tick
+        print(self.get_patch_list())
+        #如果scenario是Ramp-up-Ramp-down:
+        #更新luminosity
+
+
+        #for所有的patch:
+        #if (温度合适) & 随机数随到了:
+        #播种
+        #elif 温度不合适:
+        #死掉
+
+        #update diffuse? 需要吗
+
+        #update global temperature
+
+        '''
+        diffuseHandler();
+        Patch.calTemperature()
+        '''
+
+    #get the num of given type daisies in all the patches
+    def getDaisyNum(self):
+        patch_list = self.get_patch_list()
+        num = len(patch_list)
+        total_count = 0
+        white_count = 0
+        black_count = 0
+
+        for i in range(0, num):
+            #if this patch has Daisy alive on it
+            if patch_list[i].check_survivability is True:
+                total_count += 1
+                #print("alive")
+                '''
+                ==========
+                Daisy都是活的但是都是none???
+                ==========
+                '''
+                #if the Daisy is white:
+                print(patch_list[i].get_daisy())
+                if patch_list[i].get_daisy().get_color() == Color.WHITE:
+                    white_count += 1
+                elif patch_list[i].get_daisy().get_color() == Color.BLACK:
+                    black_count += 1
+        print("White Daisy num: ", white_count)
+        print("Black Daisy num: ", black_count)
+        print("Total Daisy num: ", total_count)
+
+        '''
+        ==================
+        问题:一开始是铺满了daisy而且全部是活的的吗
+        ==================
+        '''
+
+    #set the global temperature
+    # to the mean temperature of patches
+    def setGlobalTemperature(self):
+        patch_list = self.get_patch_list()
+        num = len(patch_list)
+        total_temp = 0
+        '''
+        ===========
+        算temperature之前要不要check sutvivability啊?
+        是只要算活着的daisy的temperature的还是所有的
+        patch都算啊?
+        ===========
+        '''
+        for i in range(0, num):
+            # if this patch has Daisy alive on it
+            #if patch_list[i].check_survivability:
+            total_temp += patch_list[i].temperature
+
+        mean_temp = total_temp / num
+        self.global_temperature = mean_temp
+        print("The golbal temperature is:", self.global_temperature)
+
 
     def test(self):
 
         self.set_up_patch_graph()
 
         self.check_survivability_handler()
-        print(patch_graph)
+
+        self.getDaisyNum()
+        self.setGlobalTemperature()
+        #print(patch_graph)
 
 
 if __name__ == "__main__":
