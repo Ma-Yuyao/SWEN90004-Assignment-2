@@ -30,6 +30,8 @@ def get_input():
                                  "high-solar-luminosity"])
     parser.add_argument("--solar_luminosity", help="albedo of surface", type=float, nargs='?', const=1, default=0.800)
     parser.add_argument("--albedo_of_surface", help="albedo of surface", type=float, nargs='?', const=1, default=0.4)
+    parser.add_argument("--pollution_level", help="The pollution_level is extension part, which simulates the human's pollution. \
+        It has 3 levels: 1-Low; 2-Medium; 3-High. The default value is 0 namely no pollution", type=int, nargs='?', const=1, default=0)
     args = parser.parse_args()
     return args
 
@@ -49,6 +51,7 @@ class daisy_world(object):
         self.scenario = args.scenario
         self.solar_luminosity = args.solar_luminosity
         self.max_age = args.max_age
+        self.pollution_level = args.pollution_level
         self.DIFFUSE_PERCENT = 50
         self.black_num = 0
         self.white_num = 0
@@ -245,9 +248,43 @@ class daisy_world(object):
         # 'set global-temperature (mean [temperature] of patches)' in NetLogo
         self.cal_global_temperature()
 
+    # Extension: humam pollution
+    # 1 - Low: Destroy 10% alive daisies randomly every 50 ticks
+    # 2 - Medium: Destroy 25% alive daisies randomly every 50 ticks
+    # 3 - High: Destroy 50% alive daisies randomly every 50 ticks
+    def pollution_simulation(self, pollution_level):
+        destroyed_percentage = 0
+        if (pollution_level == 1):
+            destroyed_percentage = 0.1
+        if (pollution_level == 2):
+            destroyed_percentage = 0.25
+        if (pollution_level == 3):
+            destroyed_percentage = 0.5
+        
+        white_num = self.get_daisy_num(Color.WHITE)
+        black_num = self.get_daisy_num(Color.BLACK)
+        total_num = white_num + black_num
+        destroyed_num = total_num * destroyed_percentage
+        
+        patch_with_daisy_list = self.get_patch_with_daisy()
+
+        for num in range(0, int(destroyed_num)):
+            if len(patch_with_daisy_list) == 0:
+                break
+            random_patch, patch_with_daisy_list = self.get_random_patch(patch_with_daisy_list)
+            postion = str(random_patch.x) + ',' + str(random_patch.y) 
+            patch_graph[postion].set_daisy_as_None()
+
+        print("Pollution Happened. Level:", pollution_level)
+
     # 'to go' in NetLogo
     def update_every_tick(self):
         while(self.current_tick <= self.total_ticks):
+            # Extention
+            if self.pollution_level != 0:
+                if self.current_tick % 50 == 0:
+                    self.pollution_simulation(self.pollution_level)
+
             self.white_num = self.get_daisy_num(Color.WHITE)
             self.black_num = self.get_daisy_num(Color.BLACK)
             output(self.current_tick, self.white_num, self.black_num, self.solar_luminosity, self.global_temperature)
