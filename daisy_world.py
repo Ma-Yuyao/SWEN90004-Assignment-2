@@ -286,7 +286,3 @@ class daisy_world(object):
     def start_simulation(self):
         self.setup()
         self.update_every_tick()
-
-if __name__ == "__main__":
-    daisy_world = daisy_world(get_input())
-    daisy_world.start_simulation()
