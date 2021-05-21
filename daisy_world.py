@@ -2,12 +2,11 @@ import argparse
 import random
 from daisy import Color
 from patch import Patch
+import time
 
-# NetLogo has 29 * 29 pathches
+# Define the Start point of Daisy world map
 MIN_XCOR = 0
-MAX_XCOR = 28
 MIN_YCOR = 0
-MAX_YCOR = 28
 
 # Use patch_graph to store the maping between coordinate and patch
 # Format: {(x,y): patch}
@@ -16,6 +15,11 @@ patch_graph = {}
 # Get input from command line
 def get_input():
     parser = argparse.ArgumentParser()
+    # NetLogo has 29 * 29 pathches, so the default number of X and Y are 28 seperately.
+    parser.add_argument("--x", help="Num of X-coordinate of daisy world (start from 0)", type=int, nargs='?', const=1, default=28,
+                        choices=range(0, 101))
+    parser.add_argument("--y", help="Num of y-coordinate of daisy world (start from 0)", type=int, nargs='?', const=1, default=28,
+                        choices=range(0, 101))
     parser.add_argument("--ticks", help="total ticks, Default: Infinite", type=float, nargs='?', const=1, default=float('inf'))
     parser.add_argument("--max_age", help="The max age of daisy", type=int, nargs='?', const=1, default=25,
                         choices=range(0, 1000))
@@ -28,20 +32,18 @@ def get_input():
     parser.add_argument("--scenario", help="scenario", nargs='?', const=1, default="main-cuurent-luminosity",
                         choices=["ramp-up-ramp-down", "low-solar-luminosity", "our-solar-luminosity",
                                  "high-solar-luminosity"])
-    parser.add_argument("--solar_luminosity", help="albedo of surface", type=float, nargs='?', const=1, default=0.800)
+    parser.add_argument("--solar_luminosity", help="albedo of surface", type=float, nargs='?', const=1, default=1.00)
     parser.add_argument("--albedo_of_surface", help="albedo of surface", type=float, nargs='?', const=1, default=0.4)
     parser.add_argument("--pollution_level", help="The pollution_level is extension part, which simulates the human's pollution. \
         It has 3 levels: 1-Low; 2-Medium; 3-High. The default value is 0 namely no pollution", type=int, nargs='?', const=1, default=0)
+    parser.add_argument("--pollution_frequency", help="How many ticks does one pollution occur, default: 25 ticks", type=int, nargs='?', const=1, default=25)
     args = parser.parse_args()
     return args
 
-# Format the output
-def output(current_tick, white_num, black_num, solar_luminosity, global_temperature):
-    print("current_tick", current_tick, "white_num", white_num, "black_num", black_num, 
-          "solar_luminosity", solar_luminosity, "global_temperature", global_temperature)
-
 class daisy_world(object):
     def __init__(self, args):
+        self.x_max = args.x
+        self.y_max = args.y
         self.total_ticks = args.ticks
         self.start_whites = args.start_whites
         self.start_blacks = args.start_blacks
@@ -52,16 +54,40 @@ class daisy_world(object):
         self.solar_luminosity = args.solar_luminosity
         self.max_age = args.max_age
         self.pollution_level = args.pollution_level
+        self.pollution_frequency = args.pollution_frequency
         self.DIFFUSE_PERCENT = 50
         self.black_num = 0
         self.white_num = 0
         self.global_temperature = 0
-        self.current_tick = 0
+        self.current_tick = 1 # current_tick starts with 1 because the setup is treated as 0
+
+    # Format the output and export the output to file
+    def output(self, current_tick, white_num, black_num, solar_luminosity, global_temperature, f):
+        # Format the output
+        fmt = "{:<10}\t{:<10}\t{:<10}\t{:<15}\t\t{:<20}"
+        print(fmt.format(current_tick, white_num, black_num, solar_luminosity, global_temperature))
+        fmt = "{:<10}\t\t{:<10}\t{:<10}\t{:<15}\t\t{:<20}"
+        f.write("\n" + fmt.format(current_tick, white_num, black_num, solar_luminosity, global_temperature))
+
+    def output_one_time(self, f):
+        space = "   "
+        general_info = "The range of X coordinate: (0 - " + str(self.x_max) + ")\nThe range of Y coordinate: (0 - " + str(self.y_max) + \
+        ")\nScenario: " + self.scenario + "\nPollution level: " + str(self.pollution_level) + "    "
+        if self.pollution_level != 0:
+            general_info += "; Pollution frequency: every " + str(self.pollution_frequency) + " ticks\n"
+        else:
+            general_info += '\n'
+        print(general_info)
+        f.write(general_info)
+        fmt = "{:<10}\t{:<10}\t{:<10}\t{:<15}\t{:<15}"
+        print("\n" + fmt.format("Current_tick", "White_num","Black_num","Solar_luminosity","Global_temperature"))
+        f.write("\n")
+        f.write(fmt.format("Current_tick", "White_num","Black_num","Solar_luminosity","Global_temperature"))
 
     def initialize_patch_graph(self):
         # In python, range() is left-closed and right-open interval
-        for x in range(MIN_XCOR, MAX_XCOR + 1):
-            for y in range(MIN_YCOR, MAX_YCOR + 1):
+        for x in range(MIN_XCOR, self.x_max + 1):
+            for y in range(MIN_YCOR, self.y_max + 1):
                 position = str(x) + "," + str(y)
                 patch = Patch(x, y)
                 patch_graph[position] = patch
@@ -83,7 +109,7 @@ class daisy_world(object):
         y = patch.y
         neighbors_list = []
         # up neighbor
-        if y + 1 <= MAX_YCOR:
+        if y + 1 <= self.y_max:
             position = str(x) + "," + str(y + 1)
             neighbors_list.append(patch_graph[position])
         # down neighbor
@@ -95,11 +121,11 @@ class daisy_world(object):
             position = str(x - 1) + "," + str(y)
             neighbors_list.append(patch_graph[position])
         # right neighbor
-        if x + 1 <= MAX_XCOR:
+        if x + 1 <= self.x_max:
             position = str(x + 1) + "," + str(y)
             neighbors_list.append(patch_graph[position])
         # left up neighbor
-        if x - 1 >= MIN_XCOR and y + 1 <= MAX_YCOR:
+        if x - 1 >= MIN_XCOR and y + 1 <= self.y_max:
             position = str(x - 1) + "," + str(y + 1)
             neighbors_list.append(patch_graph[position])
         # left down neighbor
@@ -107,11 +133,11 @@ class daisy_world(object):
             position = str(x - 1) + "," + str(y - 1)
             neighbors_list.append(patch_graph[position])
         # right up neighbor
-        if x + 1 <= MAX_XCOR and y + 1 <= MAX_YCOR:
+        if x + 1 <= self.x_max and y + 1 <= self.y_max:
             position = str(x + 1) + "," + str(y + 1)
             neighbors_list.append(patch_graph[position])
         # right down neighbor
-        if x + 1 <= MAX_XCOR and y - 1 >= MIN_YCOR:
+        if x + 1 <= self.x_max and y - 1 >= MIN_YCOR:
             position = str(x + 1) + "," + str(y - 1)
             neighbors_list.append(patch_graph[position])
         return neighbors_list
@@ -119,8 +145,8 @@ class daisy_world(object):
     # Get the list of patch where has daisy
     def get_patch_with_daisy(self):
         patch_with_daisy_list = []
-        for x in range(MIN_XCOR, MAX_XCOR + 1):
-            for y in range(MIN_YCOR, MAX_YCOR + 1):
+        for x in range(MIN_XCOR, self.x_max + 1):
+            for y in range(MIN_YCOR, self.y_max + 1):
                 position = str(x) + "," + str(y)
                 patch = patch_graph[position]
                 if patch.get_daisy() != None:
@@ -151,8 +177,8 @@ class daisy_world(object):
 
     # 'diffuse temperature .5' procedure in NetLogo code
     def diffuse(self):
-        for x in range(MIN_XCOR, MAX_XCOR + 1):
-            for y in range(MIN_YCOR, MAX_YCOR + 1):
+        for x in range(MIN_XCOR, self.x_max + 1):
+            for y in range(MIN_YCOR, self.y_max + 1):
                 position = str(x) + "," + str(y)
                 patch = patch_graph[position]
                 diffuse_temperature = patch.get_temperature() * self.DIFFUSE_PERCENT / 100
@@ -163,8 +189,8 @@ class daisy_world(object):
     
     def get_empty_patch_list(self):
         empty_patch_list = []
-        for x in range(MIN_XCOR, MAX_XCOR + 1):
-            for y in range(MIN_YCOR, MAX_YCOR + 1):
+        for x in range(MIN_XCOR, self.x_max + 1):
+            for y in range(MIN_YCOR, self.y_max + 1):
                 position = str(x) + "," + str(y)
                 patch = patch_graph[position]
                 if patch.get_daisy() is None:
@@ -174,7 +200,7 @@ class daisy_world(object):
     # 'seed-whites-randomly' and 'seed-blacks-randomly' procedures in NetLogo
     def seed_daisies_randomly(self):
         empty_patch_list = self.get_empty_patch_list()
-        total_patch = (MAX_XCOR - MIN_XCOR + 1) * (MAX_YCOR - MIN_YCOR + 1)
+        total_patch = (self.x_max - MIN_XCOR + 1) * (self.y_max - MIN_YCOR + 1)
         white_daisies_num = round(total_patch * self.start_whites / 100)
         black_daisies_num = round(total_patch * self.start_blacks / 100)
         for white_count in range(0, white_daisies_num):
@@ -190,8 +216,8 @@ class daisy_world(object):
 
     # 'calc-temperature' procedure in NetLogo
     def calc_temperature(self):
-        for x in range(MIN_XCOR, MAX_XCOR + 1):
-            for y in range(MIN_YCOR, MAX_YCOR + 1):
+        for x in range(MIN_XCOR, self.x_max + 1):
+            for y in range(MIN_YCOR, self.y_max + 1):
                 position = str(x) + "," + str(y)
                 patch = patch_graph[position]
                 patch.calculate_local_temperature(self.albedo_of_surface, self.solar_luminosity)
@@ -199,8 +225,8 @@ class daisy_world(object):
     # Get the number of WHITE or BLACK daisy
     def get_daisy_num(self, color):
         num = 0
-        for x in range(MIN_XCOR, MAX_XCOR + 1):
-            for y in range(MIN_YCOR, MAX_YCOR + 1):
+        for x in range(MIN_XCOR, self.x_max + 1):
+            for y in range(MIN_YCOR, self.y_max + 1):
                 pos = str(x) + "," + str(y)
                 patch = patch_graph[pos]
                 if patch.get_daisy() != None:
@@ -211,12 +237,12 @@ class daisy_world(object):
     # 'set global-temperature (mean [temperature] of patches)' in NetLogo
     def cal_global_temperature(self):
         total_temperature = 0
-        for x in range(MIN_XCOR, MAX_XCOR + 1):
-            for y in range(MIN_YCOR, MAX_YCOR + 1):
+        for x in range(MIN_XCOR, self.x_max + 1):
+            for y in range(MIN_YCOR, self.y_max + 1):
                 pos = str(x) + "," + str(y)
                 patch = patch_graph[pos]
                 total_temperature += patch.get_temperature()
-        total_patch = (MAX_XCOR - MIN_XCOR + 1) * (MAX_YCOR - MIN_YCOR + 1)
+        total_patch = (self.x_max - MIN_XCOR + 1) * (self.y_max - MIN_YCOR + 1)
         self.global_temperature = total_temperature / total_patch
     
     # 'to setup' in NetLogo
@@ -247,6 +273,16 @@ class daisy_world(object):
 
         # 'set global-temperature (mean [temperature] of patches)' in NetLogo
         self.cal_global_temperature()
+        
+        # Update the initial set_up num
+        self.white_num = self.get_daisy_num(Color.WHITE)
+        self.black_num = self.get_daisy_num(Color.BLACK)
+
+        local_time = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+        filename = "result_" + local_time + ".out"
+        self.f = open(filename,'w',encoding='utf-8')   #encoding='utf-8':防止中文乱码
+        self.output_one_time(self.f)
+        self.output(0, self.white_num, self.black_num, self.solar_luminosity, self.global_temperature, self.f)
 
     # Extension: humam pollution
     # 1 - Low: Destroy 10% alive daisies randomly every 50 ticks
@@ -276,20 +312,19 @@ class daisy_world(object):
             patch_graph[postion].set_daisy_as_None()
 
         print("Pollution Happened. Level:", pollution_level)
+        self.f.write("\nPollution Happened. Level: " + str(pollution_level))
 
     # 'to go' in NetLogo
     def update_every_tick(self):
         while(self.current_tick <= self.total_ticks):
             # Extention
             if self.pollution_level != 0:
-                if self.current_tick % 50 == 0:
+                if self.current_tick % self.pollution_frequency == 0:
                     self.pollution_simulation(self.pollution_level)
+                    self.white_num = self.get_daisy_num(Color.WHITE)
+                    self.black_num = self.get_daisy_num(Color.BLACK)
 
-            self.white_num = self.get_daisy_num(Color.WHITE)
-            self.black_num = self.get_daisy_num(Color.BLACK)
-            output(self.current_tick, self.white_num, self.black_num, self.solar_luminosity, self.global_temperature)
-            
-            # '0ask patches [calc-temperature]' in NetLogo
+            # 'ask patches [calc-temperature]' in NetLogo
             self.calc_temperature()
 
             # 'diffuse temperature .5' in NetLogo
@@ -300,6 +335,11 @@ class daisy_world(object):
 
             # 'set global-temperature (mean [temperature] of patches)' in NetLogo
             self.cal_global_temperature()
+            if self.pollution_level == 0 or (self.pollution_level != 0 and self.current_tick % self.pollution_frequency != 0):
+                self.white_num = self.get_daisy_num(Color.WHITE)
+                self.black_num = self.get_daisy_num(Color.BLACK)
+
+            self.output(self.current_tick, self.white_num, self.black_num, self.solar_luminosity, self.global_temperature, self.f)
 
             # 'tick' in NetLogo
             self.current_tick += 1
@@ -319,6 +359,7 @@ class daisy_world(object):
                     self.solar_luminosity = float(format((self.solar_luminosity + 0.005), '.4f'))
                 if (self.current_tick > 600 and self.current_tick <= 850):
                     self.solar_luminosity = float(format((self.solar_luminosity - 0.0025), '.4f'))
+        self.f.close()
 
     def start_simulation(self):
         self.setup()
