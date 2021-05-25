@@ -11,9 +11,9 @@
 
 ## How to use
 
-*[simulator.py]*(simulator.py) is the entry point of the program. It accepts the following parameters. The default values will be assigned to unspecified parameters.
+[simulator.py](simulator.py) is the entry point of the program. It accepts the following parameters. The default values will be assigned to unspecified parameters.
 
-'''python
+```python
 --x  # Num of X-coordinate of daisy world (start from 0), Default: 28
 --y  # Num of Y-coordinate of daisy world (start from 0), Default: 28
 --ticks  # Total ticks, Default: Infinite
@@ -27,7 +27,7 @@
 --albedo_of_surface  # The albedo of surface, Default: 0.4
 --pollution_level  # The pollution_level is extension part, which simulates the human's pollution. It has 3 levels: 1-Low; 2-Medium; 3-High. The default value is 0 namely no pollution, Default: 0
 --pollution_frequency  # How many ticks does one pollution occur, Default: 25
-'''
+```
 <!-- 
 Launch command example:
     /* Program will run 1000 ticks under the default configuration. */
