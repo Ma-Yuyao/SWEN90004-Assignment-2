@@ -31,7 +31,7 @@ def get_input():
     parser.add_argument("--albedo_blacks", help="The albedo of black daisies", type=float, nargs='?', const=1, default=0.25)
     parser.add_argument("--scenario", help="scenario", nargs='?', const=1, default="our-solar-luminosity",
                         choices=["ramp-up-ramp-down", "low-solar-luminosity", "our-solar-luminosity",
-                                 "high-solar-luminosity", "maintain-cuurent-luminosity"])
+                                 "high-solar-luminosity", "maintain-current-luminosity"])
     parser.add_argument("--solar_luminosity", help="The solar luminosity you would like to set. NOTE: This only works if the scenario \
         is maintain-current-luminosity", type=float, nargs='?', const=1, default=1.00)
     parser.add_argument("--albedo_of_surface", help="The albedo of surface", type=float, nargs='?', const=1, default=0.4)

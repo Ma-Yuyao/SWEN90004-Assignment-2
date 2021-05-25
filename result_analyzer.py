@@ -1,7 +1,7 @@
 '''
 This file is used to generate 'Luminosity-tick' figure, 'Global_temperature-tick' figure and 'Population_temperature-tick' figure.
 NOTE: This file may include some third-party library to generature the figures. 
-      It is an external tool so not included in the assignment submission. 
+It is an additional implementation and will not be included in the original assignment specification. 
 '''
 
 from abc import abstractproperty

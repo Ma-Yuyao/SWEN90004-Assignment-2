@@ -1,6 +1,6 @@
-# University of Melbourne Modelling Complex Software Systems (SWEN90004) - Assignment 2
+# Modelling Complex Software Systems (SWEN90004) - Assignment 2
 
-- Course: [Modelling Complex Software Systems](https://handbook.unimelb.edu.au/2021/subjects/swen90004)
+- Course: [University of Melbourne - Modelling Complex Software Systems](https://handbook.unimelb.edu.au/2021/subjects/swen90004)
 - Instructor: [Dr. Artem Polyvyanyy](http://polyvyanyy.com/)
 
 | Student Name  | Student ID |
@@ -28,28 +28,41 @@
 --pollution_level  # The pollution_level is extension part, which simulates the human's pollution. It has 3 levels: 1-Low; 2-Medium; 3-High. The default value is 0 namely no pollution, Default: 0
 --pollution_frequency  # How many ticks does one pollution occur, Default: 25
 ```
-<!-- 
-Launch command example:
-    /* Program will run 1000 ticks under the default configuration. */
-    java Simulator -ticks 1000
 
-    /* -start-%-whites=25, -albedo-of-whites=0.8 -start-%-blacks=25 -albedo-of-blacks=0.20 
-     * Program will run 1000 ticks.
-     */
-    java Simulator -ticks 1000 -start-%-whites 25 -albedo-of-whites 0.8 -start-%-blacks 25 -albedo-of-blacks 0.20
-    
-    /*
-     * scenario is ramp-up-ramp-down. Program will run 1000 ticks.
-     * note: according to the scenario you specify, -solar-luminosity will be covered even if you alreadly specify its value
-     */
-     java Simulator -ticks 1000 -scenario ramp-up-ramp-down
+Examples:
 
-     /*
-      * generate 50 male rabbits and 80 female rabbits. Program will run 1000 ticks.
-      */
-    java Simulator -ticks 1000 -start-male-rabbits 50 -start-female-rabbits 80
-
-After launch the program, it will print the configuration firstly. If the input parameters are wrong, it will give you corresponding wrong information. If the input parameters are right, it should generate a csv file called "output.csv".
 ```python
-python3 simulator.py
-``` -->
+python3 simulator.py # Run the program with all arguments of default values
+```
+
+```python
+python3 simulator.py --x 20 --y 20 --ticks 1000 --max_age 100 --scenario high-solar-luminosity 
+# Run the program with 21 * 21 maps, 1000 ticks, 100 as max age of the daisy, and high-solar-luminosity scenario, and other arguments of default values
+```
+
+```python
+python3 simulator.py --pollution_level 3 --pollution_frequency 10
+# Run the program with 3 pollution level as well as every 10 ticks pollution frequency, and other arguments of default values
+```
+
+
+After running the program, it will print the key information as well the update for each tick on command lind. Besides, a result file containing key information named "result_$local_time.out" (i.e. "result_2021-05-25_23-30-12.out") will be generated.
+
+## Additional Tool for analysis
+
+We also achieve an analysis tool [result_analyzer.py](simulator.py) for generating 'Luminosity-tick' figure, 'Global_temperature-tick' figure and 'Population_temperature-tick' figure.
+
+**NOTE**: This file may include some third-party library to generature the figures. It is an additional implementation and will not be included in the original assignment specification. 
+
+### How to use
+Let's say the filename of result file is "result_2021-05-25_23-30-12.out". Use the below command to start the analyzer.
+
+```python
+python3 result_analyzer.py --result_name result_2021-05-25_23-30-12.out
+```
+
+If it says "Some model is not found", please install the required model manually.
+
+Then three figures will be generated and displayed individually. And a folder named "result_2021-05-25_23-46-13" containing these three figures will also be generated.
+
+Thanks a lot for the guidance of the teaching team!
