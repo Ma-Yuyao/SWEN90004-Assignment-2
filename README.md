@@ -1,7 +1,7 @@
 # University of Melbourne Modelling Complex Software Systems (SWEN90004) - Assignment 2
 
 - Course: [Modelling Complex Software Systems](https://handbook.unimelb.edu.au/2021/subjects/swen90004)
-- Instructor: [Dr. Artem Polyvyanyy] (http://polyvyanyy.com/)
+- Instructor: [Dr. Artem Polyvyanyy](http://polyvyanyy.com/)
 
 | Student Name  | Student ID |
 | ------------- | ------------- |
@@ -11,9 +11,9 @@
 
 ## How to use
 
-*simulator.py*[simulator.py] is the entry point of the program. It accepts the following parameters. The default values will be assigned to unspecified parameters.
+*[simulator.py]*(simulator.py) is the entry point of the program. It accepts the following parameters. The default values will be assigned to unspecified parameters.
 
-'''Python
+'''python
 --x  # Num of X-coordinate of daisy world (start from 0), Default: 28
 --y  # Num of Y-coordinate of daisy world (start from 0), Default: 28
 --ticks  # Total ticks, Default: Infinite
