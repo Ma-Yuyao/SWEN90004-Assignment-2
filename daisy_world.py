@@ -20,20 +20,21 @@ def get_input():
                         choices=range(0, 101))
     parser.add_argument("--y", help="Num of y-coordinate of daisy world (start from 0)", type=int, nargs='?', const=1, default=28,
                         choices=range(0, 101))
-    parser.add_argument("--ticks", help="total ticks, Default: Infinite", type=float, nargs='?', const=1, default=float('inf'))
+    parser.add_argument("--ticks", help="Total ticks, Default: Infinite", type=float, nargs='?', const=1, default=float('inf'))
     parser.add_argument("--max_age", help="The max age of daisy", type=int, nargs='?', const=1, default=25,
                         choices=range(0, 1000))
-    parser.add_argument("--start_whites", help="white num", type=int, nargs='?', const=1, default=20,
+    parser.add_argument("--start_whites", help="The percent of white daisies when setup", type=int, nargs='?', const=1, default=20,
                         choices=range(0, 50))
-    parser.add_argument("--start_blacks", help="black num", type=int, nargs='?', const=1, default=20,
+    parser.add_argument("--start_blacks", help="The percent of black daisies when setup", type=int, nargs='?', const=1, default=20,
                         choices=range(0, 50))
-    parser.add_argument("--albedo_whites", help="albedo of whites", type=float, nargs='?', const=1, default=0.75)
-    parser.add_argument("--albedo_blacks", help="albedo of blacks", type=float, nargs='?', const=1, default=0.25)
-    parser.add_argument("--scenario", help="scenario", nargs='?', const=1, default="main-cuurent-luminosity",
+    parser.add_argument("--albedo_whites", help="The albedo of white daisies", type=float, nargs='?', const=1, default=0.75)
+    parser.add_argument("--albedo_blacks", help="The albedo of black daisies", type=float, nargs='?', const=1, default=0.25)
+    parser.add_argument("--scenario", help="scenario", nargs='?', const=1, default="our-solar-luminosity",
                         choices=["ramp-up-ramp-down", "low-solar-luminosity", "our-solar-luminosity",
-                                 "high-solar-luminosity"])
-    parser.add_argument("--solar_luminosity", help="albedo of surface", type=float, nargs='?', const=1, default=1.00)
-    parser.add_argument("--albedo_of_surface", help="albedo of surface", type=float, nargs='?', const=1, default=0.4)
+                                 "high-solar-luminosity", "maintain-cuurent-luminosity"])
+    parser.add_argument("--solar_luminosity", help="The solar luminosity you would like to set. NOTE: This only works if the scenario \
+        is maintain-current-luminosity", type=float, nargs='?', const=1, default=1.00)
+    parser.add_argument("--albedo_of_surface", help="The albedo of surface", type=float, nargs='?', const=1, default=0.4)
     parser.add_argument("--pollution_level", help="The pollution_level is extension part, which simulates the human's pollution. \
         It has 3 levels: 1-Low; 2-Medium; 3-High. The default value is 0 namely no pollution", type=int, nargs='?', const=1, default=0)
     parser.add_argument("--pollution_frequency", help="How many ticks does one pollution occur, default: 25 ticks", type=int, nargs='?', const=1, default=25)
