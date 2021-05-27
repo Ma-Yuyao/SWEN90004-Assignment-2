@@ -17,7 +17,7 @@ class Daisy:
         self._albedo = albedo
         self._max_age = max_age
 
-        # Based on NetLogo code，age is a random int between 0 to max_age
+        # Based on NetLogo code, age is a random int between 0 to max_age
         self._age = random.randint(0, self._max_age)
 
     # Geter and Seter functions

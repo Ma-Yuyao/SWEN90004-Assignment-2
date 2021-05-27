@@ -281,7 +281,7 @@ class daisy_world(object):
 
         local_time = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
         filename = "result_" + local_time + ".out"
-        self.f = open(filename,'w',encoding='utf-8')   #encoding='utf-8':防止中文乱码
+        self.f = open(filename,'w',encoding='utf-8')
         self.output_one_time(self.f)
         self.output(0, self.white_num, self.black_num, self.solar_luminosity, self.global_temperature, self.f)
 
