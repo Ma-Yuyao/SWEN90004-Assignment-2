@@ -209,7 +209,7 @@ class daisy_world(object):
             if empty_patch != None:
                 empty_patch.set_daisy(Color.WHITE, self.albedo_whites, self.max_age)
                 patch_graph[empty_patch.x, empty_patch.y] = empty_patch
-        for black_count in range(0, white_daisies_num):
+        for black_count in range(0, black_daisies_num):
             empty_patch, empty_patch_list = self.get_random_patch(empty_patch_list)
             if empty_patch != None:
                 empty_patch.set_daisy(Color.BLACK, self.albedo_blacks, self.max_age)
