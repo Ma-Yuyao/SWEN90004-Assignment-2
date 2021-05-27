@@ -258,11 +258,7 @@ class daisy_world(object):
             self.solar_luminosity = 1.4
         
         if (self.scenario == "ramp-up-ramp-down"):
-            if (self.current_tick > 200 and self.current_tick <= 400):
-                # Keep 4 decimal places
-                self.solar_luminosity = float(format((self.solar_luminosity + 0.005), '.4f'))
-            if (self.current_tick > 600 and self.current_tick <= 850):
-                self.solar_luminosity = float(format((self.solar_luminosity - 0.0025), '.4f'))
+            self.solar_luminosity = 0.8
         
         self.initialize_patch_graph()
 
