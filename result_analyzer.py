@@ -26,13 +26,13 @@ def read_file(filepath):
             index += 1
             if index < 7:
                 continue  
-            if line[0] is 'P':
+            if line[0] == 'P':
                 continue
             string = ""
             one_group_list = []
             time = 0
             for i in line:
-                if i is (' ') or i is('\t'):
+                if i == (' ') or i ==('\t'):
                     time += 1
                     if time == 1:
                         one_group_list.append(string)
