@@ -1,3 +1,7 @@
+'''
+This class is the entry point for the project to start up the simulation. 
+'''
+
 from daisy_world import *
 
 def main():

@@ -1,3 +1,8 @@
+'''
+This class represents the simulated world that this model runs on, which is in charge of 
+the details of the simulation.
+'''
+
 import argparse
 import random
 from daisy import Color

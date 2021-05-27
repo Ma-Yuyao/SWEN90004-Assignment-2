@@ -1,3 +1,8 @@
+'''
+This class abstracts and defines the attributes of daisy, stores information such as the colour, age and albedo of the daisy, 
+manages the interactions between daisy and other classes  
+'''
+
 from enum import Enum
 import random
 

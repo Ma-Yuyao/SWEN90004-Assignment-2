@@ -1,3 +1,8 @@
+'''
+This class represents the patch from our lattice, defining related attributes
+such as local temperature and daisy information, and functions.   
+'''
+
 import math
 import random
 from daisy import Daisy
